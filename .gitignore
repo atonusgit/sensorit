@@ -1,0 +1,7 @@
+.env
+nohup.out
+deprecated
+development
+status_files
+sensor_logs
+script_logs
