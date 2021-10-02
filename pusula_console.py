@@ -11,7 +11,7 @@ load_dotenv()
 
 status_files_dir = os.getenv('ROOT_DIRECTORY') + "/status_files"
 pistorasiat_root = os.getenv('PISTORASIAT_ROOT_DIRECTORY')
-pistorasiat_user = os.getenv('PISTORASIAT_USER')
+pistorasiat_user = os.getenv('PISTORASIAT_USERNAME')
 
 group_a_status = False
 group_a_text = "Sisävalot"
