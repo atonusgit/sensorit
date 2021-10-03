@@ -70,6 +70,7 @@ def kastelu_hold():
     global kastelu_seconds_left
     global h_status
     print('A thread on')
+    os.system("ssh " + pistorasiat_user + "@" + str(pistorasiat_address) + " 'python3 " + pistorasiat_root + "/remote_control.py B on'")
     while True:
         if kastelu_seconds_left > 0:
             kastelu_seconds_left = kastelu_seconds_left - 1
@@ -78,6 +79,7 @@ def kastelu_hold():
             progress_bar.UpdateBar(abs(kastelu_seconds - kastelu_seconds_left))
             time.sleep(1)
         else:
+            os.system("ssh " + pistorasiat_user + "@" + str(pistorasiat_address) + " 'python3 " + pistorasiat_root + "/remote_control.py B off'")
             h_status = 'off'
             break
 
@@ -136,13 +138,11 @@ while True:
             kastelu = threading.Thread(target=kastelu_hold, daemon=True)
             kastelu_seconds_left = kastelu_seconds
             kastelu.start()
-            os.system("ssh " + pistorasiat_user + "@" + str(pistorasiat_address) + " 'python3 " + pistorasiat_root + "/remote_control.py B on'")
             h_status = 'on'
         elif h_status == 'on':
             if kastelu.is_alive():
                 print('A off')
                 kastelu_seconds_left = 0
-                os.system("ssh " + pistorasiat_user + "@" + str(pistorasiat_address) + " 'python3 " + pistorasiat_root + "/remote_control.py B off'")
             h_status = 'off'
 
     if not button_pressed:
