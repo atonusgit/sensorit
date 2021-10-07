@@ -10,6 +10,7 @@ kappe () {
         ssh $KAPPE_USERNAME@$kappe_ip -p $KAPPE_SSH_PORT
 }
 
+alias pcg=". $ROOT_DIRECTORY/pusula_console_guard.sh"
 alias pistorasiat="ssh $PISTORASIAT_USERNAME@$PISTORASIAT_ADDRESS"
 
 alias aon="ssh $PISTORASIAT_USERNAME@$PISTORASIAT_ADDRESS python3 $PISTORASIAT_ROOT_DIRECTORY/remote_control.py A on"
@@ -39,4 +40,4 @@ alias hoff="ssh $PISTORASIAT_USERNAME@$PISTORASIAT_ADDRESS python3 $PISTORASIAT_
 alias wsock="cd $ROOT_DIRECTORY/status_files; nohup websocat -tvvv ws://$(cat $ROOT_DIRECTORY/status_files/kappe_ip):$WEBSOCKET_PORT writefile:$ROOT_DIRECTORY/status_files/websocket_output --ping-interval 60 & >/dev/null"
 alias wsockint="cd $ROOT_DIRECTORY/status_files; nohup bash $ROOT_DIRECTORY/websocket_interpreter.sh & >/dev/null"
 
-cd ~/sensorit
+cd $ROOT_DIRECTORY
