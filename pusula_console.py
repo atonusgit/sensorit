@@ -70,6 +70,7 @@ def kastelu_hold():
     global kastelu_seconds_left
     global h_status
     print('A thread on')
+    window['H'].update('Käynnistetään ...', button_color='black on yellow')
     os.system("ssh " + pistorasiat_user + "@" + str(pistorasiat_address) + " 'python3 " + pistorasiat_root + "/remote_control.py B on'")
     while True:
         if kastelu_seconds_left > 0:
@@ -79,6 +80,7 @@ def kastelu_hold():
             progress_bar.UpdateBar(abs(kastelu_seconds - kastelu_seconds_left))
             time.sleep(1)
         else:
+            window['H'].update('Sammutetaan ...', button_color='black on yellow')
             os.system("ssh " + pistorasiat_user + "@" + str(pistorasiat_address) + " 'python3 " + pistorasiat_root + "/remote_control.py B off'")
             h_status = 'off'
             break
