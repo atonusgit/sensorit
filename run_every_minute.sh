@@ -25,3 +25,10 @@ if [[ $reboot_switch -eq 1 ]]; then
     curl http://valle.fi/reboot_switch.php?set=2
     sudo reboot
 fi
+
+git_pull_switch=$(curl http://valle.fi/git_pull_switch.php)
+if [[ $git_pull_switch -eq 1 ]]; then
+    cd $KAPPE_ROOT_DIRECTORY
+    git pull
+    curl http://valle.fi/git_pull_switch.php?set=2
+fi
