@@ -9,10 +9,15 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+pistorasiat_root = os.getenv('PISTORASIAT_ROOT_DIRECTORY')
+pistorasiat_user = os.getenv('PISTORASIAT_USERNAME')
+pistorasiat_address=os.getenv('PISTORASIAT_ADDRESS')
+
 # List of macs of sensors which data will be collected
 # If list is empty, data will be collected for all found sensors
 macs = ['00:00:00:00:00:00', 'EE:1B:38:69:04:A5', 'F0:A2:43:0F:F8:F3', 'F4:06:DB:A1:07:83', 'E6:FB:19:D6:DD:09', 'C6:45:03:0B:5F:4F', 'E0:50:B9:86:15:BF', 'F1:31:71:E6:A4:B6']
 names = ['kello', 'kuisti', 'saunan_putket', 'keittion_putket', 'vessan_putket', 'sisalla', 'vessa', 'kasvihuone']
+sockets = ['0', '0', '0', 'A', '0', '0', '0', '0']
 temperatures_alert_thresholds = [0, -50, -50, -50, -50, -50, -50, -50]
 temp_switch_on_thresholds = [-100, -100, -100, 5, -100, -100, -100, -100]
 temp_switch_off_thresholds = [100, 100, 100, 17, 100, 100, 100, 100]
@@ -87,11 +92,13 @@ for i, mac in enumerate(macs, start=0):
 	# switch on
 	if (names[i] != 'kello') and (inputdata['temperature'] < temp_switch_on_thresholds[i]):
 		print(names[i] + ' - on')
+		os.system("ssh " + pistorasiat_user + "@" + str(pistorasiat_address) + " 'python3 " + pistorasiat_root + "/remote_control.py " + sockets[i] + " on'")
 		write_json({"status": 1}, names[i] + "_switch.json")
 
 	# switch off
 	if (names[i] != 'kello') and (inputdata['temperature'] > temp_switch_off_thresholds[i]):
 		print(names[i] + ' - off')
+		os.system("ssh " + pistorasiat_user + "@" + str(pistorasiat_address) + " 'python3 " + pistorasiat_root + "/remote_control.py " + sockets[i] + " off'")
 		write_json({"status": 2}, names[i] + "_switch.json")
 
 log_date = datetime.datetime.now()
