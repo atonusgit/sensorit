@@ -13,22 +13,98 @@ status_files_dir = os.getenv('ROOT_DIRECTORY') + "/status_files"
 pistorasiat_root = os.getenv('PISTORASIAT_ROOT_DIRECTORY')
 pistorasiat_user = os.getenv('PISTORASIAT_USERNAME')
 
+sockets = {
+    "A": {
+        "text" : "Lämmitin",
+        "status" : False
+    },
+    "B": {
+        "text" : "Sänky",
+        "status" : False
+    },
+    "C": {
+        "text" : "Hylly",
+        "status" : False
+    },
+    "D": {
+        "text" : "Kone",
+        "status" : False
+    },
+    "E": {
+        "text" : "Raketti",
+        "status" : False
+    },
+    "F": {
+        "text" : "Joost",
+        "status" : False
+    },
+    "G": {
+        "text" : "Puu",
+        "status" : False
+    },
+    "H": {
+        "text" : "Kasvit",
+        "status" : False
+    },
+}
+
 group_a_status = False
-group_a_text = "Sisävalot"
+group_a_text = "Kaikki sisävalot"
 group_b_status = False
-group_b_text = "Ulkovalot"
-h_status = 'off'
+group_b_text = "Kaikki ulkovalot"
+i_status = 'off'
 all_processes = []
 kastelu_seconds = 15
 button_pressed = False
 pistorasiat_address=os.getenv('PISTORASIAT_ADDRESS')
 
+tab1_layout =  [
+    [
+        sg.Button(group_a_text, button_color='black on white', key='GROUP_A', font=('Helvetica', 20), size=(20,2))
+    ],
+    [
+        sg.Button(group_b_text, button_color='black on white', key='GROUP_B', font=('Helvetica', 20), size=(20,2))
+    ],
+    [
+        sg.Button('Kastelu ' + str(kastelu_seconds) + 's', button_color='black on white', key='I', font=('Helvetica', 20), size=(20,2))
+    ],
+    [
+        sg.ProgressBar(kastelu_seconds, orientation='h', size=(35,10), key='progressbar', bar_color='green on white')
+    ]
+]
+
+tab2_layout = [
+    [
+        sg.Button(sockets['B']['text'], button_color='black on white', key='B', font=('Helvetica', 15), size=(9,1)),
+        sg.Button(sockets['C']['text'], button_color='black on white', key='C', font=('Helvetica', 15), size=(9,1))
+    ],
+    [
+        sg.Button(sockets['D']['text'], button_color='black on white', key='D', font=('Helvetica', 15), size=(9,1)),
+        sg.Button(sockets['E']['text'], button_color='black on white', key='E', font=('Helvetica', 15), size=(9,1))
+    ],
+    [
+        sg.Button(sockets['A']['text'], button_color='black on white', key='A', font=('Helvetica', 15), size=(9,1)),
+        sg.Button(sockets['F']['text'], button_color='black on white', key='F', font=('Helvetica', 15), size=(9,1))
+    ],
+    [
+        sg.Button(sockets['G']['text'], button_color='black on white', key='G', font=('Helvetica', 15), size=(9,1)),
+        sg.Button(sockets['H']['text'], button_color='black on white', key='H', font=('Helvetica', 15), size=(9,1))
+    ]
+]
+
 layout = [
-    [sg.Button(group_a_text,button_color='black on white',key='GROUP_A',font=('Helvetica', 20),size=(20,2))],
-    [sg.Button(group_b_text,button_color='black on white',key='GROUP_B',font=('Helvetica', 20),size=(20,2))],
-    [sg.Button('Kastelu ' + str(kastelu_seconds) + 's',button_color='black on white',key='H',font=('Helvetica', 20),size=(20,2))],
-    [sg.ProgressBar(kastelu_seconds, orientation='h', size=(35,10), key='progressbar', bar_color='green on white')],
-    [sg.Exit(font=('Helvetica', 20),size=(20,2))]
+    [
+        sg.TabGroup([
+            [
+                sg.Tab('Ryhmät', tab1_layout),
+                sg.Tab('Yksittäiset', tab2_layout)
+            ]
+        ],
+        border_width=(0))
+    ],
+    [
+        sg.Exit(font=('Helvetica', 20), size=(20,2))
+    ]
 ]
 
 window = sg.Window('Pusula console', layout, size=(320,480), element_justification="center", finalize=True)
@@ -36,6 +112,7 @@ window.Maximize()
 progress_bar = window['progressbar']
 
 def button_status():
+    global sockets
     global group_a_status
     global group_b_status
     pistorasiat_status = ''
@@ -43,6 +120,15 @@ def button_status():
     if path.exists(status_files_dir + "/all_status.json"):
         with open(status_files_dir + "/all_status.json") as f:
             pistorasiat_status = json.load(f)
+
+    for pistorasia_item in pistorasiat_status:
+        if pistorasia_item in ["A", "B", "C", "D", "E", "F", "G", "H"]:
+            if pistorasiat_status[pistorasia_item]["status"] == "is_read_on":
+                sockets[pistorasia_item]["status"] = False
+                window[pistorasia_item].update(button_color='white on green')
+            else:
+                sockets[pistorasia_item]["status"] = True
+                window[pistorasia_item].update(button_color='black on white')
 
     # sisävalot status
     if pistorasiat_status["GROUP_A"]["status"] == "is_read_on":
@@ -68,25 +154,25 @@ def button_status():
 
 def kastelu_hold():
     global kastelu_seconds_left
-    global h_status
+    global i_status
     print('A thread on')
-    window['H'].update('Käynnistetään ...', button_color='black on yellow')
+    window['I'].update('Käynnistetään ...', button_color='black on yellow')
     os.system("ssh " + pistorasiat_user + "@" + str(pistorasiat_address) + " 'python3 " + pistorasiat_root + "/remote_control.py B on'")
     while True:
         if kastelu_seconds_left > 0:
             kastelu_seconds_left = kastelu_seconds_left - 1
             x = str(kastelu_seconds_left)
-            window['H'].update('Kastellaan .. ' + x + 's', button_color='white on red')
+            window['I'].update('Kastellaan .. ' + x + 's', button_color='white on red')
             progress_bar.UpdateBar(abs(kastelu_seconds - kastelu_seconds_left))
             time.sleep(1)
         else:
-            window['H'].update('Sammutetaan ...', button_color='black on yellow')
+            window['I'].update('Sammutetaan ...', button_color='black on yellow')
             os.system("ssh " + pistorasiat_user + "@" + str(pistorasiat_address) + " 'python3 " + pistorasiat_root + "/remote_control.py B off'")
-            h_status = 'off'
+            i_status = 'off'
             break
 
     # if kastelu.is_alive():
-    window['H'].update('Kastelu ' + str(kastelu_seconds) + 's', button_color='black on white')
+    window['I'].update('Kastelu ' + str(kastelu_seconds) + 's', button_color='black on white')
     progress_bar.UpdateBar(0)
     print('A thread off')
 
@@ -134,20 +220,30 @@ while True:
             group_b_on.start()
 
     # kastelu
-    elif event == 'H':
-        print(h_status)
-        if h_status == 'off':
+    elif event == 'I':
+        print(i_status)
+        if i_status == 'off':
             kastelu = threading.Thread(target=kastelu_hold, daemon=True)
             kastelu_seconds_left = kastelu_seconds
             kastelu.start()
-            h_status = 'on'
+            i_status = 'on'
         elif h_status == 'on':
             if kastelu.is_alive():
                 print('A off')
                 kastelu_seconds_left = 0
-            h_status = 'off'
+            i_status = 'off'
+
+    # yksittäinen
+    elif event in ["A", "B", "C", "D", "E", "F", "G", "H"]:
+        if sockets[event]["status"]:
+            socket_on = threading.Thread(target=switch, args=(event, "on", sockets[event]["text"]), daemon=True)
+            socket_on.start()
+        else:
+            socket_on = threading.Thread(target=switch, args=(event, "off", sockets[event]["text"]), daemon=True)
+            socket_on.start()
 
     if not button_pressed:
         button_status()
 
 window.close()
+
