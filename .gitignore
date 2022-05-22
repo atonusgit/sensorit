@@ -5,3 +5,5 @@ development
 status_files
 sensor_logs
 script_logs
+sunrise_sunset_logs
+dyndns_cron_error.log
