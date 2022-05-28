@@ -33,6 +33,12 @@ def write_json(data, filename='data.json'):
 	with open(logsfolder + filename, 'w') as f:
 		json.dump(data, f, indent=4)
 
+def read_json(filename=os.getenv('ROOT_DIRECTORY') + "/status_files/all_status.json"):
+	with open(filename, encoding='utf-8') as json_file:
+		return json.load(json_file)
+
+all_status = read_json()
+
 # error logging
 log_date = datetime.datetime.now()
 print(log_date.strftime("%m.%d %H:%M:%S start"))
@@ -90,13 +96,13 @@ for i, mac in enumerate(macs, start=0):
 		print(temp_switch_on_thresholds[i])
 
 	# switch on
-	if (names[i] != 'kello') and (inputdata['temperature'] < temp_switch_on_thresholds[i]):
+	if (names[i] != 'kello') and (inputdata['temperature'] < temp_switch_on_thresholds[i]) and all_status[sockets[i]]["status"] == 'is_read_off':
 		print(names[i] + ' - on')
 		os.system("ssh " + pistorasiat_user + "@" + str(pistorasiat_address) + " 'python3 " + pistorasiat_root + "/remote_control.py " + sockets[i] + " on'")
 		write_json({"status": 1}, names[i] + "_switch.json")
 
 	# switch off
-	if (names[i] != 'kello') and (inputdata['temperature'] > temp_switch_off_thresholds[i]):
+	if (names[i] != 'kello') and (inputdata['temperature'] > temp_switch_off_thresholds[i]) and all_status[sockets[i]]["status"] == 'is_read_on':
 		print(names[i] + ' - off')
 		os.system("ssh " + pistorasiat_user + "@" + str(pistorasiat_address) + " 'python3 " + pistorasiat_root + "/remote_control.py " + sockets[i] + " off'")
 		write_json({"status": 2}, names[i] + "_switch.json")
