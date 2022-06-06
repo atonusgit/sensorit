@@ -157,7 +157,7 @@ def kastelu_hold():
     global i_status
     print('A thread on')
     window['I'].update('Käynnistetään ...', button_color='black on yellow')
-    os.system("ssh " + pistorasiat_user + "@" + str(pistorasiat_address) + " 'python3 " + pistorasiat_root + "/remote_control.py B on'")
+    os.system("ssh " + pistorasiat_user + "@" + str(pistorasiat_address) + " 'python3 " + pistorasiat_root + "/remote_control.py H on'")
     while True:
         if kastelu_seconds_left > 0:
             kastelu_seconds_left = kastelu_seconds_left - 1
@@ -167,7 +167,9 @@ def kastelu_hold():
             time.sleep(1)
         else:
             window['I'].update('Sammutetaan ...', button_color='black on yellow')
-            os.system("ssh " + pistorasiat_user + "@" + str(pistorasiat_address) + " 'python3 " + pistorasiat_root + "/remote_control.py B off'")
+            os.system("ssh " + pistorasiat_user + "@" + str(pistorasiat_address) + " 'python3 " + pistorasiat_root + "/remote_control.py H off'")
+            os.system("ssh " + pistorasiat_user + "@" + str(pistorasiat_address) + " 'python3 " + pistorasiat_root + "/remote_control.py H off'")
+            os.system("ssh " + pistorasiat_user + "@" + str(pistorasiat_address) + " 'python3 " + pistorasiat_root + "/remote_control.py H off'")
             i_status = 'off'
             break
 
@@ -179,8 +181,8 @@ def kastelu_hold():
 def switch(target, status, button_cta_text):
     global button_pressed
     button_pressed = True
-    if status == 'on': button_loading_text = 'Sytytetään ...'
-    if status == 'off': button_loading_text = 'Sammutetaan ...'
+    if status == 'on': button_loading_text = 'Syttyy ...'
+    if status == 'off': button_loading_text = 'Sammuu ...'
     window[target].update(button_loading_text, button_color='black on yellow')
     os.system("ssh " + pistorasiat_user + "@" + str(pistorasiat_address) + " 'python3 " + pistorasiat_root + "/remote_control.py " + target + " " + status + "'")
     window[target].update(button_cta_text, button_color='black on white')
