@@ -62,9 +62,9 @@ tab1_layout =  [
     [
         sg.Button(group_a_text, button_color='black on white', key='GROUP_A', font=('Helvetica', 20), size=(20,2))
     ],
-    [
-        sg.Button(group_b_text, button_color='black on white', key='GROUP_B', font=('Helvetica', 20), size=(20,2))
-    ],
+ #   [
+ #       sg.Button(group_b_text, button_color='black on white', key='GROUP_B', font=('Helvetica', 20), size=(20,2))
+ #   ],
     [
         sg.Button('Kastelu ' + str(kastelu_seconds) + 's', button_color='black on white', key='I', font=('Helvetica', 20), size=(20,2))
     ],
@@ -144,13 +144,13 @@ def button_status():
     # ulkovalot status
     if pistorasiat_status["GROUP_B"]["status"] == "is_read_on":
       group_b_status = False
-      window['GROUP_B'].update(button_color='white on green')
+#      window['GROUP_B'].update(button_color='white on green')
     elif pistorasiat_status["GROUP_B"]["status"] == "is_read_off":
       group_b_status = True
-      window['GROUP_B'].update(button_color='black on white')
+#      window['GROUP_B'].update(button_color='black on white')
     else:
       group_b_status = True
-      window['GROUP_B'].update(button_color='black on yellow')
+#      window['GROUP_B'].update(button_color='black on yellow')
 
 def kastelu_hold():
     global kastelu_seconds_left

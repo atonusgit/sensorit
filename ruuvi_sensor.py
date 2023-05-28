@@ -20,7 +20,7 @@ names = ['kello', 'kuisti', 'saunan_putket', 'keittion_putket', 'vessan_putket',
 sockets = ['0', '0', '0', 'A', '0', '0', '0', '0']
 temperatures_alert_thresholds = [0, -50, -50, -50, -50, -50, -50, -50]
 temp_switch_on_thresholds = [-100, -100, -100, 5, -100, -100, -100, -100]
-temp_switch_off_thresholds = [100, 100, 100, 17, 100, 100, 100, 100]
+temp_switch_off_thresholds = [100, 100, 100, 14, 100, 100, 100, 100]
 
 logsfolder = os.getenv('ROOT_DIRECTORY') + "/sensor_logs/"
 tmp = {"data_format": 0, "humidity": 0, "temperature": 0, "pressure": 0, "acceleration": 0, "acceleration_x": 0, "acceleration_y": 0, "acceleration_z": 0, "tx_power": 0, "battery": 0, "movement_counter": 0, "measurement_sequence_number": 0, "mac": "-"}
@@ -106,6 +106,37 @@ for i, mac in enumerate(macs, start=0):
 		print(names[i] + ' - off')
 		os.system("ssh " + pistorasiat_user + "@" + str(pistorasiat_address) + " 'python3 " + pistorasiat_root + "/remote_control.py " + sockets[i] + " off'")
 		write_json({"status": 2}, names[i] + "_switch.json")
+
+# soil sensor
+
+# get data from tmp
+try:
+        with open(logsfolder + "multa_tmp.json", "r") as file_data:
+                tmp = json.load(file_data)
+except:
+        pass
+
+tmp['timestamp'] = timestamp
+inputdata = tmp
+
+try:
+        soil_data = os.popen("ssh pi@kosteus.local python3 /home/pi/kosteus/get_soil_data.py").read()
+        soil_data = json.loads(soil_data)
+        soil_data['timestamp'] = timestamp
+        inputdata = soil_data
+except:
+        print('error with reading soil sensor')
+
+filename = datetime.datetime.now().strftime("%y%m%d_multa.json")
+try:
+        with open(logsfolder + filename) as json_file:
+                data = json.load(json_file)
+                data.append(inputdata)
+except:
+        data = [inputdata]
+
+write_json(data, filename)
+write_json(inputdata, "multa_tmp.json")
 
 log_date = datetime.datetime.now()
 print(log_date.strftime("%m.%d %H:%M:%S done"))

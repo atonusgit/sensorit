@@ -12,6 +12,7 @@ kappe () {
 
 alias pcg=". $ROOT_DIRECTORY/pusula_console_guard.sh"
 alias pistorasiat="ssh $PISTORASIAT_USERNAME@$PISTORASIAT_ADDRESS"
+alias kosteus="ssh $KOSTEUS_USERNAME@$KOSTEUS_ADDRESS"
 
 alias aon="ssh $PISTORASIAT_USERNAME@$PISTORASIAT_ADDRESS python3 $PISTORASIAT_ROOT_DIRECTORY/remote_control.py A on"
 alias aoff="ssh $PISTORASIAT_USERNAME@$PISTORASIAT_ADDRESS python3 $PISTORASIAT_ROOT_DIRECTORY/remote_control.py A off"
